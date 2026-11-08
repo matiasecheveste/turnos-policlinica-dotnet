@@ -57,6 +57,15 @@ public sealed class ApiPruebas(FabricaApi fabrica) : IClassFixture<FabricaApi>
     }
 
     [Fact]
+    public async Task UnCuerpoMalFormadoEsUnErrorDelCliente()
+    {
+        using var cuerpo = new StringContent("{\"cedula\": \"4.567.890-5\",", System.Text.Encoding.UTF8, "application/json");
+        var r = await cliente.PostAsync("/api/pacientes", cuerpo, Cancelacion);
+        Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);
+        Assert.Equal("application/problem+json", r.Content.Headers.ContentType!.MediaType);
+    }
+
+    [Fact]
     public async Task FlujoCompletoDeUnTurno()
     {
         var alta = await cliente.PostAsJsonAsync("/api/pacientes", new { cedula = "4.567.890-5", nombre = "Valentina Ruiz", nacimiento = "1985-07-14" }, Cancelacion);

@@ -27,7 +27,11 @@ builder.Services.AddRateLimiter(o =>
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
+// Un cuerpo JSON mal formado es un error del cliente (400), no del servidor.
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = error => error is BadHttpRequestException pedido ? pedido.StatusCode : StatusCodes.Status500InternalServerError,
+});
 app.UseStatusCodePages();
 app.UseRateLimiter();
 
